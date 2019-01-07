@@ -139,6 +139,9 @@ class system:
 
     def update_strategies_stochastic(self, score, atrs):
 
+        # Flag that when True interrupts the code
+        interrupt_flag = True
+
         D_max = max([self.rules[1,0], 1]) - min([self.rules[0,1], 0])
 
         # calculting the outcome of the round
@@ -150,18 +153,26 @@ class system:
             k_max = (max([self.network.degree(nei), self.network.degree(node)]))
 
             if score[nei] > score[node]:
-                print((score[nei] - score[node])/(k_max * D_max))
+                # print((score[nei] - score[node])/(k_max * D_max))
+                interrupt_flag = False
+
                 if np.random.rand() < (score[nei] - score[node])/(k_max * D_max):
                     atrs[node] = atrs[nei]
 
         nx.set_node_attributes(self.network, atrs, 'strategy')
+
+        return interrupt_flag
 
     def evolve (self, N = 1):
         for i in range(0,N):
             atrs = nx.get_node_attributes(self.network,'strategy')
             score = self.get_scores(atrs)
             # self.update_strategies(score, atrs)
-            self.update_strategies_stochastic(score, atrs)
+            int_flag = self.update_strategies_stochastic(score, atrs)
+
+            if int_flag == True:
+                # print('Interrupted')
+                break
 
     def evaluate(self):
         '''This function evaluates the number of elements of each species'''
@@ -190,26 +201,28 @@ class system:
             j = 0
             for T in np.linspace(0, 2, num  = points, endpoint = True):
 
-                self.rules[1,0] = T
-                self.uniform_conditions()
+                for iteration in range(0,repetitions):
+                    self.rules[1,0] = T
+                    self.uniform_conditions()
 
-                print(self.evaluate())
+                    print(self.evaluate())
 
-                # print('rules:', self.rules)
-                self.evolve(1000)
+                    # print('rules:', self.rules)
+                    self.evolve(1000)
 
-                sol = self.evaluate()
+                    sol = self.evaluate()
 
-                for key in dic:
-                    if key in sol:
-                        dic[key][i,j] = sol[key]
-                    else:
-                        dic[key][i,j] = 0
-                    # print(dic[key][i,j])
-                print(self.evaluate())
+                    for key in dic:
+                        if key in sol:
+                            dic[key][i,j] += sol[key]
+                        else:
+                            dic[key][i,j] = 0
+                        # print(dic[key][i,j])
+                    print(self.evaluate())
 
                 j += 1
                 print('i:', i, 'j:', j)
+                # print(dic)
 
             i += 1
 
