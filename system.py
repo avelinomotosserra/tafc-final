@@ -5,6 +5,11 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# counter liibrary
+import collections
+
+sns.set_style("whitegrid")
+
 
 class system:
 
@@ -34,7 +39,6 @@ class system:
 
             elif structure == 'ER':
                 if len(dimensions) < 3 and isinstance(dimensions[0], int) and isinstance(dimensions[1], float):
-                    print('here')
                     self.network = nx.erdos_renyi_graph(dimensions[0], dimensions[1])
 
                 else:
@@ -112,11 +116,43 @@ class system:
         nx.draw_networkx(self.network, pos=pos, node_color=colors, node_size = 10, with_labels = False)
         plt.show()
 
+    def degree_distribution(self, scale = None, cumulative = False):
+
+        deg_dict = self.network.degree()
+        # print(deg_dict)
+
+        degree_sequence = sorted([d for n, d in deg_dict], reverse=True)
+        degreeCount = collections.Counter(degree_sequence)
+        # print(degreeCount)
+
+        deg, cnt = zip(*degreeCount.items())
+
+        cnt = [i / sum(cnt) for i in cnt]
+
+        if cumulative == True:
+            cnt = np.cumsum(cnt[0:-1])
+            deg = deg[0:-1]
+
+        fig, ax = plt.subplots()
+        plt.scatter(deg, cnt, color='b')
+
+        if scale == 'log':
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+
+            plt.ylim(min(cnt),1)
+            plt.xlim(min(deg), max(deg))
+            
+        plt.xlabel('Degree of the node')
+        plt.ylabel('Number of nodes')
+
+        plt.show()
+
+        return 0
+
     def get_scores(self, atrs):
         # Returns the score optained after a round of the game
-
         score = {}
-
 
         # Calculating the scores resulting of playing the game
         for node in self.network.nodes():
