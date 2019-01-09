@@ -8,7 +8,7 @@ import seaborn as sns
 
 class system:
 
-    def __init__ (self, structure = 'grid', distribution = 'uniform', dimensions = (2,2), rules = np.matrix([[0,0],[0,0]])):
+    def __init__ (self, structure = 'grid', distribution = 'uniform', dimensions = (2,2), rules = np.matrix([[0.,0.],[0.,0.]])):
 
         # This will define a class that generates a grid of n by m elemets of agents
 
@@ -28,6 +28,14 @@ class system:
             elif structure == 'BA':
                 if len(dimensions) < 3 and isinstance(dimensions[0], int) and isinstance(dimensions[1], int):
                     self.network = nx.barabasi_albert_graph(dimensions[0], dimensions[1])
+
+                else:
+                    ValueError('Too many arguments for option for grid')
+
+            elif structure == 'ER':
+                if len(dimensions) < 3 and isinstance(dimensions[0], int) and isinstance(dimensions[1], float):
+                    print('here')
+                    self.network = nx.erdos_renyi_graph(dimensions[0], dimensions[1])
 
                 else:
                     ValueError('Too many arguments for option for grid')
@@ -109,6 +117,7 @@ class system:
 
         score = {}
 
+
         # Calculating the scores resulting of playing the game
         for node in self.network.nodes():
             score[node] = 0
@@ -189,6 +198,9 @@ class system:
 
     def grid_test(self, points = 21, repetitions = 10):
 
+        # Gurantee that the rules are inaccordance for every dilema
+        self.rules[0,0] = 1
+
         dic = {}
         for i in range(0,2):
             dic[i] = np.empty([points, points])
@@ -200,14 +212,14 @@ class system:
             self.rules[0, 1] = S
             j = 0
             for T in np.linspace(0, 2, num  = points, endpoint = True):
+                self.rules[1,0] = T
+
+                print(self.rules)
 
                 for iteration in range(0,repetitions):
-                    self.rules[1,0] = T
                     self.uniform_conditions()
 
                     print(self.evaluate())
-
-                    # print('rules:', self.rules)
                     self.evolve(1000)
 
                     sol = self.evaluate()
@@ -230,12 +242,15 @@ class system:
         np.save('txt/data_1',dic[1])
 
 
-    def plot_solution(self):
+    def plot_solution(self, points = 10):
         sol_1 = np.load('txt/data_0.npy')
         sol_2 = np.load('txt/data_1.npy')
 
-        sns.heatmap(sol_1)
+        S_values = np.linspace(-1, 1, num = points, endpoint = True)
+        T_values = np.linspace(0, 2, num  = points, endpoint = True)
+
+        sns.heatmap(sol_1, xticklabels = S_values, yticklabels = T_values)
         plt.show()
 
-        sns.heatmap(sol_2)
-        plt.show()
+        # sns.heatmap(sol_2)
+        # plt.show()
