@@ -13,7 +13,7 @@ sns.set_style("whitegrid")
 
 class system:
 
-    def __init__ (self, structure = 'grid', distribution = 'uniform', dimensions = (2,2), rules = np.matrix([[0.,0.],[0.,0.]])):
+    def __init__ (self, structure = 'grid', distribution = 'uniform', dimensions = (2,2), custom_net = None, rules = np.matrix([[0.,0.],[0.,0.]])):
 
         # This will define a class that generates a grid of n by m elemets of agents
 
@@ -43,6 +43,13 @@ class system:
 
                 else:
                     ValueError('Too many arguments for option for grid')
+
+            elif structure == 'custom':
+                if custom_net != None :
+                    self.network = custom_net
+
+                else:
+                    ValueError('Value for custom network was not provided')
             else:
                 raise ValueError('Unknown option for structure')
 
@@ -130,19 +137,32 @@ class system:
         cnt = [i / sum(cnt) for i in cnt]
 
         if cumulative == True:
-            cnt = np.cumsum(cnt[0:-1])
-            deg = deg[0:-1]
+            cnt = np.cumsum(cnt[0:])
+            # print(cnt)
+            # print(deg)
 
         fig, ax = plt.subplots()
         plt.scatter(deg, cnt, color='b')
 
-        if scale == 'log':
+        if scale == 'loglog':
             ax.set_xscale('log')
             ax.set_yscale('log')
 
-            plt.ylim(min(cnt),1)
+            plt.ylim(min(cnt),max(cnt))
             plt.xlim(min(deg), max(deg))
-            
+
+        elif scale == 'loglin':
+            ax.set_xscale('log')
+
+            plt.ylim(min(cnt),max(cnt))
+            plt.xlim(min(deg), max(deg))
+
+        elif scale == 'linlog':
+            ax.set_yscale('log')
+
+            plt.ylim(min(cnt),max(cnt))
+            plt.xlim(min(deg), max(deg))
+
         plt.xlabel('Degree of the node')
         plt.ylabel('Number of nodes')
 
