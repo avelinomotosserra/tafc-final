@@ -10,7 +10,7 @@ grid = system(structure = 'grid', dimensions = (32,32))
 # grid.evolve(1)
 # grid.plot_grid()
 
-# grid.grid_test(points = 10, repetitions = 1)
-grid.plot_solution()
+# grid.grid_test(points = 21, repetitions = 1)
+grid.plot_solution(folder = 'Aq_grid/')
 
 # grid.evaluate()

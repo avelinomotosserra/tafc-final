@@ -164,7 +164,7 @@ class system:
             plt.xlim(min(deg), max(deg))
 
         plt.xlabel('Degree of the node')
-        plt.ylabel('Number of nodes')
+        plt.ylabel('Probability')
 
         plt.show()
 
@@ -294,18 +294,32 @@ class system:
 
             i += 1
 
-        np.save('txt/data_0',dic[0])
-        np.save('txt/data_1',dic[1])
+        np.save('txt/data_0_grid',dic[0])
+        np.save('txt/data_1_grid',dic[1])
 
 
-    def plot_solution(self, points = 10):
-        sol_1 = np.load('txt/data_0.npy')
-        sol_2 = np.load('txt/data_1.npy')
+    def plot_solution(self, points = 21, folder = '' ):
+        sol_1 = np.load('txt/' + folder + 'data_0.npy')
+        sol_2 = np.load('txt/' + folder + 'data_1.npy')
 
-        S_values = np.linspace(-1, 1, num = points, endpoint = True)
-        T_values = np.linspace(0, 2, num  = points, endpoint = True)
+        S_values = np.round(np.linspace(-1, 1, num = points, endpoint = True), decimals = 1)
+        T_values = np.round(np.linspace(2, 0, num  = points, endpoint = True), decimals = 1)
 
-        sns.heatmap(sol_1, xticklabels = S_values, yticklabels = T_values)
+        # print(sol_1)
+        sol_1_t = np.copy(sol_1)
+        i = 0
+        for row in sol_1:
+            j = 0
+            for element in row:
+                sol_1_t[20-i,j] = element /max(sol_1.flatten())
+                # print()
+                # print(element)
+                j+=1
+            i+=1
+
+        # sns.heatmap(sol_1, xticklabels = S_values, yticklabels = T_values)
+        # plt.show()
+        sns.heatmap(sol_1_t, xticklabels = S_values, yticklabels = T_values, cmap = "coolwarm")
         plt.show()
 
         # sns.heatmap(sol_2)

@@ -10,7 +10,10 @@ grid = system(structure = 'BA', dimensions = (1000,4))
 # grid.evolve(100)
 # grid.plot_grid()
 
-grid.plot_solution()
-# grid.grid_test(points = 10, repetitions = 1)
+grid.degree_distribution(cumulative = True, scale = 'loglog')
+
+
+# grid.grid_test(points = 21, repetitions = 1)
+grid.plot_solution(folder = 'Aq_3/')
 
 # grid.evaluate()
